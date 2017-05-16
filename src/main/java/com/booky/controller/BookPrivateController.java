@@ -1,5 +1,6 @@
 package com.booky.controller;
 
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
@@ -13,7 +14,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.booky.dto.BasketDTO;
 import com.booky.dto.BookDTO;
+import com.booky.dto.StockDTO;
 import com.booky.entity.Book;
 import com.booky.exception.BookNotFoundException;
 import com.booky.service.BookService;
@@ -64,6 +67,18 @@ public class BookPrivateController {
 	    Thread.sleep(10);
 	}
 	return new BookDTO(book.get());
+
+    }
+    
+    @PostMapping("/order")
+    public List<StockDTO> deleteBook(@RequestBody List<BasketDTO> basketDTOList)
+	    throws BookNotFoundException, InterruptedException, ExecutionException {
+	log.debug("Ordering books ");
+	Future<List<StockDTO>> stockList = bookService.orderBook(basketDTOList);
+	while (!stockList.isDone()) {
+	    Thread.sleep(10);
+	}
+	return stockList.get();
 
     }
 }

@@ -15,7 +15,7 @@ public final class JwtUserFactory {
 	}
 
 	public static JwtUser create(BookyUser user) {
-		return new JwtUser(user.getId(), user.getEmail(), user.getFirstname(), user.getLastname(), user.getPassword(),
+		return new JwtUser(user.getId(),  user.getFirstname(), user.getLastname(),user.getEmail(), user.getPassword(),
 				mapToGrantedAuthorities(user.getAuthorities()), user.getEnabled(), user.getLastPasswordResetDate());
 	}
 

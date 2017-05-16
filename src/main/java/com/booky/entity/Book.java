@@ -27,7 +27,6 @@ public class Book implements Serializable {
 	@Column(length = 100, unique = true, nullable = false)
 	private String name;
 
-	@Size(min = 10, max = 13)
 	@Column
 	private Long isbn;
 

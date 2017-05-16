@@ -1,8 +1,13 @@
 package com.booky.service;
 
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.Future;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,11 +20,14 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.booky.dto.BasketDTO;
 import com.booky.dto.BookDTO;
+import com.booky.dto.StockDTO;
 import com.booky.entity.Book;
 import com.booky.entity.Category;
+import com.booky.entity.Stock;
 import com.booky.exception.BookAlreadyExistsException;
 import com.booky.exception.BookNotFoundException;
 import com.booky.repository.BookRepository;
+import com.booky.repository.StockRepository;
 
 @Service
 @Transactional
@@ -30,10 +38,13 @@ public class BookService {
 	private final BookRepository bookRepository;
 
 	private final CategoryService categoryService;
+	
+	private final StockRepository stockRepository;
 
-	public BookService(BookRepository bookRepository, CategoryService categoryService) {
+	public BookService(BookRepository bookRepository, CategoryService categoryService,StockRepository stockRepository) {
 		this.bookRepository = bookRepository;
 		this.categoryService = categoryService;
+		this.stockRepository=stockRepository;
 	}
 
 	public Book getBookByIsbn(Long isbn) throws BookNotFoundException {
@@ -96,8 +107,14 @@ public class BookService {
 			Category category = categoryService.getCategoryById(bookDTO.getCategory().getId());
 			book.setCategory(category);
 		}
+		
+		try{
+			bookRepository.save(book);
+		}catch(Exception e){
+			log.error(e.getMessage());
+		}
 
-		return new AsyncResult<>(bookRepository.save(book));
+		return new AsyncResult<>(book);
 	}
 
 	@Async
@@ -131,8 +148,30 @@ public class BookService {
 	}
 	
 	@Async
-	public Future<List<BasketDTO>> orderBook(List<BasketDTO> basketDTO) {
-		return null;
+	public Future<List<StockDTO>> orderBook(List<BasketDTO> basketDTOList) {
+		
+		Map<BasketDTO, Long> result =
+				basketDTOList.stream().collect(
+                Collectors.groupingBy(
+                        Function.identity(), Collectors.counting()
+                )
+        );
+		List<StockDTO> stockDTOList=new ArrayList<StockDTO>();
+		for(BasketDTO basketDTO:basketDTOList){
+			Long amount=result.get(basketDTO);
+			if(amount!=null){
+			Stock stock=new Stock();
+			Book book=bookRepository.findOne(basketDTO.getBook().getId());
+			stock.setBook(book);
+			stock.setSold(Integer.parseInt(amount.toString()));
+			stock.setDate(new Date());
+			stockRepository.save(stock);
+			stockDTOList.add(new StockDTO(stock));
+			result.remove(basketDTO);
+			}
+		}
+		
+		return new AsyncResult<>(stockDTOList);
 	}
 
 	public Page<Book> getBookByCategoryName(Pageable pageable, String categoryName) {
