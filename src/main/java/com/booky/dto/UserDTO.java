@@ -1,18 +1,38 @@
 package com.booky.dto;
 
 import java.io.Serializable;
+import java.util.Date;
 
-public class UserDTO implements Serializable{
+import com.booky.entity.BookyUser;
+
+public class UserDTO implements Serializable {
 
 	private Long id;
 
-	private String email;
-
 	private String password;
 
-	private String firstName;
+	private String firstname;
 
-	private String lastName;
+	private String lastname;
+
+	private String email;
+
+	private Boolean enabled;
+
+	private Date lastPasswordResetDate;
+
+	public UserDTO() {
+
+	}
+
+	public UserDTO(BookyUser user) {
+		this.id = user.getId();
+		this.email = user.getEmail();
+		this.password = user.getPassword();
+		this.firstname = user.getFirstname();
+		this.lastname = user.getLastname();
+		this.lastPasswordResetDate = user.getLastPasswordResetDate();
+	}
 
 	public Long getId() {
 		return id;
@@ -38,20 +58,36 @@ public class UserDTO implements Serializable{
 		this.password = password;
 	}
 
-	public String getFirstName() {
-		return firstName;
+	public String getFirstname() {
+		return firstname;
 	}
 
-	public void setFirstName(String firstName) {
-		this.firstName = firstName;
+	public void setFirstname(String firstname) {
+		this.firstname = firstname;
 	}
 
-	public String getLastName() {
-		return lastName;
+	public String getLastname() {
+		return lastname;
 	}
 
-	public void setLastName(String lastName) {
-		this.lastName = lastName;
+	public void setLastname(String lastname) {
+		this.lastname = lastname;
+	}
+
+	public Boolean getEnabled() {
+		return enabled;
+	}
+
+	public void setEnabled(Boolean enabled) {
+		this.enabled = enabled;
+	}
+
+	public Date getLastPasswordResetDate() {
+		return lastPasswordResetDate;
+	}
+
+	public void setLastPasswordResetDate(Date lastPasswordResetDate) {
+		this.lastPasswordResetDate = lastPasswordResetDate;
 	}
 
 }

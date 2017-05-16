@@ -27,8 +27,7 @@ public class CategoryController {
 	this.categoryService = categoryService;
     }
 
-    @GetMapping("/createCategory/{name}")
-   
+    @GetMapping("/createCategory/{name}")   
     public CategoryDTO createBook(@PathVariable String name) throws InterruptedException, ExecutionException {
 	log.debug("Creating category");
 	Future<Category> category=categoryService.createCategory(name);

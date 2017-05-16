@@ -16,6 +16,11 @@ public class UserDetail extends org.springframework.security.core.userdetails.Us
 	private String username;
 	private String password;
 
+	private boolean accountNonExpired;
+	private boolean accountNonLocked;
+	private boolean credentialsNonExpired;
+	private boolean enabled;
+
 	public String getUsername() {
 		return username;
 	}
@@ -33,21 +38,45 @@ public class UserDetail extends org.springframework.security.core.userdetails.Us
 	}
 
 	@Override
+	public Collection<GrantedAuthority> getAuthorities() {
+	
+		return null;
+	}
+
+	@Override
+	public boolean isAccountNonExpired() {
+		
+		return accountNonExpired;
+	}
+
+	@Override
 	public boolean isAccountNonLocked() {
-		// TODO Auto-generated method stub
-		return false;
+	
+		return accountNonLocked;
 	}
 
 	@Override
 	public boolean isCredentialsNonExpired() {
-		// TODO Auto-generated method stub
-		return false;
+	
+		return credentialsNonExpired;
 	}
 
 	@Override
 	public boolean isEnabled() {
-		// TODO Auto-generated method stub
-		return false;
+	
+		return enabled;
+	}
+
+	public void setAccountNonExpired(boolean accountNonExpired) {
+		this.accountNonExpired = accountNonExpired;
+	}
+
+	public void setAccountNonLocked(boolean accountNonLocked) {
+		this.accountNonLocked = accountNonLocked;
+	}
+
+	public void setCredentialsNonExpired(boolean credentialsNonExpired) {
+		this.credentialsNonExpired = credentialsNonExpired;
 	}
 
 }

@@ -29,12 +29,14 @@ public class UserService {
 		this.userRepository = userRepository;
 		this.passwordEncoder = passwordEncoder;
 	}
+	
+	
 
 	public BookyUser createUser(UserDTO userDTO) {
 		BookyUser user = new BookyUser();
 		user.setEmail(userDTO.getEmail());
-		user.setFirstName(userDTO.getFirstName());
-		user.setLastName(userDTO.getLastName());
+		user.setFirstname(userDTO.getFirstname());
+		user.setLastname(userDTO.getLastname());
 		String encryptedPassword = passwordEncoder.encode(userDTO.getPassword());
 		user.setPassword(encryptedPassword);
 		userRepository.save(user);
@@ -52,8 +54,8 @@ public class UserService {
 	public BookyUser updateUser(UserDTO userDTO) {
 		BookyUser user = userRepository.findOne(userDTO.getId());
 		user.setEmail(userDTO.getEmail());
-		user.setFirstName(userDTO.getFirstName());
-		user.setLastName(userDTO.getLastName());
+		user.setFirstname(userDTO.getFirstname());
+		user.setLastname(userDTO.getLastname());
 		log.debug("Updated User: {}", user);
 		return userRepository.save(user);
 
