@@ -1,5 +1,6 @@
 package com.booky.service;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.Future;
 
@@ -12,6 +13,7 @@ import org.springframework.scheduling.annotation.AsyncResult;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.booky.dto.BasketDTO;
 import com.booky.dto.BookDTO;
 import com.booky.entity.Book;
 import com.booky.entity.Category;
@@ -126,6 +128,11 @@ public class BookService {
 			return new AsyncResult<Book>(book);
 
 		}
+	}
+	
+	@Async
+	public Future<List<BasketDTO>> orderBook(List<BasketDTO> basketDTO) {
+		return null;
 	}
 
 	public Page<Book> getBookByCategoryName(Pageable pageable, String categoryName) {
