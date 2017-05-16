@@ -12,10 +12,13 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import com.booky.dto.UserDTO;
 import com.booky.entity.BookyUser;
+import com.booky.exception.UserNotFoundException;
 import com.booky.repository.BookyUserRepository;
 import com.booky.service.UserService;
 
@@ -27,19 +30,23 @@ public class UserServiceTest {
 
 	private UserService userService;
 
-	@MockBean
+	
 	private PasswordEncoder passwordEncoder;
 
 	private Optional<BookyUser> bookOptional;
+	
+	private BookyUser bookyUser=null;
 
 	@Before
 	public void setUp() throws Exception {
-
+		passwordEncoder=new BCryptPasswordEncoder();
 		userService = spy(new UserService(bookyUserRepository, passwordEncoder));
-		BookyUser bookyUser = new BookyUser();
+		bookyUser = new BookyUser();
+		bookyUser.setId(1L);
 		bookyUser.setEmail("serhadburakan@hotmail.com");
 		bookyUser.setFirstname("serhad");
 		bookyUser.setLastname("burakan");
+		bookyUser.setPassword("serhad");
 		bookyUser.setLastPasswordResetDate(new Date());
 		bookOptional=Optional.of(bookyUser);
 	}
@@ -59,5 +66,48 @@ public class UserServiceTest {
 		userService.getByEmail("serhadburakan@hotmail.com");
 		
 	}
+	
+	@Test
+	public void createUserSuccessful() {
+		when(bookyUserRepository.save(bookyUser)).thenReturn(bookyUser);
+		BookyUser user = userService.createUser(new UserDTO(bookyUser));
+		String encodedPass=passwordEncoder.encode(bookyUser.getPassword());
+		assert (user.getPassword().substring(0, 5).equals(encodedPass.substring(0,5)));
+		assert (bookyUser.getLastname().equals("burakan"));
+	}
+	
+	@Test
+	public void updateUserSuccessful() {
+		when(bookyUserRepository.findOne(1L)).thenReturn(bookyUser);
+		when(bookyUserRepository.save(bookyUser)).thenReturn(bookyUser);
+		BookyUser user = userService.updateUser(new UserDTO(bookyUser));
+		String encodedPass=passwordEncoder.encode(bookyUser.getPassword());
+		assert (user.getPassword().substring(0, 5).equals(encodedPass.substring(0,5)));
+		assert (bookyUser.getLastname().equals("burakan"));
+	}
+	
+	@Test(expected=UserNotFoundException.class)
+	public void updateUserUserNotFound() {
+		when(bookyUserRepository.save(bookyUser)).thenReturn(bookyUser);
+		BookyUser user = userService.updateUser(new UserDTO(bookyUser));
+		String encodedPass=passwordEncoder.encode(bookyUser.getPassword());
+		assert (user.getPassword().substring(0, 5).equals(encodedPass.substring(0,5)));
+		assert (bookyUser.getLastname().equals("burakan"));
+	}
+	
+	
+	@Test
+	public void deleteUserUserNotFound() {
+		when(bookyUserRepository.findOne(1L)).thenReturn(bookyUser);
+		BookyUser user = userService.deleteUser(1L);
+		assert (user.getLastname().equals("burakan"));
+	}
+	
+	@Test(expected=UserNotFoundException.class)
+	public void deleteUserSuccessful() {
+		when(bookyUserRepository.findOne(1L)).thenReturn(null);
+		userService.deleteUser(1L);		
+	}
+	
 
 }

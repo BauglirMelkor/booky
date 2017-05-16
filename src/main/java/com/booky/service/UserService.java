@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.booky.dto.UserDTO;
 import com.booky.entity.BookyUser;
+import com.booky.exception.UserNotFoundException;
 import com.booky.repository.BookyUserRepository;
 
 /**
@@ -47,31 +48,30 @@ public class UserService {
 		try{
 			bookyUserRepository.save(user);
 		}catch(Exception e){
-			e.printStackTrace();
+			log.error(e.getMessage());
 		}
 		return user;
 		
 	}
 
-	/**
-	 * Update all information for a specific user, and return the modified user.
-	 *
-	 * @param userDTO
-	 *            user to update
-	 * @return updated user
-	 */
+	
 	public BookyUser updateUser(UserDTO userDTO) {
 		BookyUser user = bookyUserRepository.findOne(userDTO.getId());
+		if(user==null){
+			throw new UserNotFoundException("user not found for id "+userDTO.getId());			
+		}
 		user.setEmail(userDTO.getEmail());
 		user.setFirstname(userDTO.getFirstname());
 		user.setLastname(userDTO.getLastname());
 		user.setEnabled(true);
 		user.setLastPasswordResetDate(new Date());
+		String encryptedPassword = passwordEncoder.encode(userDTO.getPassword());
+		user.setPassword(encryptedPassword);
 		log.debug("Updated User: {}", user);
 		try{
 			bookyUserRepository.save(user);
 		}catch(Exception e){
-			e.printStackTrace();
+			log.error(e.getMessage());
 		}
 		return user;
 
@@ -79,6 +79,9 @@ public class UserService {
 
 	public BookyUser deleteUser(Long id) {
 		BookyUser user = bookyUserRepository.findOne(id);
+		if(user==null){
+			throw new UserNotFoundException("user not found for id "+id);			
+		}
 		bookyUserRepository.delete(user);
 		log.debug("Deleted User: {}", user);
 		return user;
