@@ -150,15 +150,15 @@ public class BookService {
 	@Async
 	public Future<List<StockDTO>> orderBook(List<BasketDTO> basketDTOList) {
 		
-		Map<BasketDTO, Long> result =
+		Map<BasketDTO, Integer> result =
 				basketDTOList.stream().collect(
                 Collectors.groupingBy(
-                        Function.identity(), Collectors.counting()
+                        Function.identity(), Collectors.summingInt(p->p.getQuantity())
                 )
         );
 		List<StockDTO> stockDTOList=new ArrayList<StockDTO>();
 		for(BasketDTO basketDTO:basketDTOList){
-			Long amount=result.get(basketDTO);
+			Integer amount=result.get(basketDTO);
 			if(amount!=null){
 			Stock stock=new Stock();
 			Book book=bookRepository.findOne(basketDTO.getBook().getId());

@@ -32,6 +32,9 @@ public class Book implements Serializable {
 
 	@ManyToOne
 	private Category category;
+	
+	@Column
+	private Double price;
 
 	public Long getId() {
 		return id;
@@ -73,6 +76,14 @@ public class Book implements Serializable {
 		this.isbn = bookDTO.getIsbn();
 		this.name = bookDTO.getName();
 
+	}
+
+	public Double getPrice() {
+		return price;
+	}
+
+	public void setPrice(Double price) {
+		this.price = price;
 	}
 
 }
