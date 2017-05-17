@@ -71,7 +71,7 @@ public class BookPrivateController {
     }
     
     @PostMapping("/order")
-    public List<StockDTO> deleteBook(@RequestBody List<BasketDTO> basketDTOList)
+    public List<StockDTO> orderBook(@RequestBody List<BasketDTO> basketDTOList)
 	    throws BookNotFoundException, InterruptedException, ExecutionException {
 	log.debug("Ordering books ");
 	Future<List<StockDTO>> stockList = bookService.orderBook(basketDTOList);

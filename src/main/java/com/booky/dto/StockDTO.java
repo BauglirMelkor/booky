@@ -18,7 +18,10 @@ public class StockDTO {
 
 	private int sold;
 
+	public StockDTO() {
+	}
 
+	
 	public StockDTO(Stock stock) {
 		this.book=stock.getBook();
 		this.date=stock.getDate();

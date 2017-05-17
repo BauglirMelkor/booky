@@ -32,6 +32,7 @@ public class UserDTO implements Serializable {
 		this.firstname = user.getFirstname();
 		this.lastname = user.getLastname();
 		this.lastPasswordResetDate = user.getLastPasswordResetDate();
+		this.enabled=user.getEnabled();
 	}
 
 	public Long getId() {

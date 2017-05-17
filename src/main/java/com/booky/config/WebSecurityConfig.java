@@ -17,7 +17,6 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import com.booky.security.JwtAuthenticationEntryPoint;
 import com.booky.security.JwtAuthenticationTokenFilter;
 
-
 @Configuration
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true)
@@ -56,7 +55,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 				.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
 
 				.authorizeRequests().antMatchers("/auth/**").permitAll().antMatchers("/user/**").permitAll()
-				.anyRequest().authenticated();
+				.antMatchers("/book/public/**").permitAll().anyRequest().authenticated();
 
 		// Custom JWT based security filter
 		httpSecurity.addFilterBefore(authenticationTokenFilterBean(), UsernamePasswordAuthenticationFilter.class);

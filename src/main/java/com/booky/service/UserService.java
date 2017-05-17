@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.booky.dto.UserDTO;
 import com.booky.entity.BookyUser;
+import com.booky.exception.UserAlreadyExistsException;
 import com.booky.exception.UserNotFoundException;
 import com.booky.repository.BookyUserRepository;
 
@@ -36,6 +37,11 @@ public class UserService {
 	
 
 	public BookyUser createUser(UserDTO userDTO) {
+		
+		if(bookyUserRepository.findOneByEmail(userDTO.getEmail()).isPresent()){
+		throw new UserAlreadyExistsException("user with email "+userDTO.getEmail()+" already exists");	
+		}
+		
 		BookyUser user = new BookyUser();
 		user.setEmail(userDTO.getEmail());
 		user.setFirstname(userDTO.getFirstname());
