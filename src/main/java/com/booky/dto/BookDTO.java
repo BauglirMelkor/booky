@@ -12,6 +12,8 @@ public class BookDTO {
 
     private CategoryDTO category = new CategoryDTO();
     
+    private Double price;
+    
     public BookDTO() {
 	
     }
@@ -20,6 +22,7 @@ public class BookDTO {
 	this.id = book.getId();
 	this.name = book.getName();
 	this.isbn = book.getIsbn();
+	this.price=book.getPrice();
 	this.category.setId(book.getCategory().getId());
 	this.category.setName(book.getCategory().getName());
 
@@ -56,5 +59,16 @@ public class BookDTO {
     public void setCategory(CategoryDTO category) {
         this.category = category;
     }
+
+	public Double getPrice() {
+		if(price==null){
+			price=0d;
+		}
+		return price;
+	}
+
+	public void setPrice(Double price) {
+		this.price = price;
+	}
 
 }

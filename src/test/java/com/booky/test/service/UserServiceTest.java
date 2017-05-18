@@ -18,6 +18,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 import com.booky.dto.UserDTO;
 import com.booky.entity.BookyUser;
+import com.booky.exception.UserAlreadyExistsException;
 import com.booky.exception.UserNotFoundException;
 import com.booky.repository.BookyUserRepository;
 import com.booky.service.UserService;
@@ -33,7 +34,7 @@ public class UserServiceTest {
 	
 	private PasswordEncoder passwordEncoder;
 
-	private Optional<BookyUser> bookOptional;
+	private Optional<BookyUser> bookyUserOptional;
 	
 	private BookyUser bookyUser=null;
 
@@ -48,12 +49,12 @@ public class UserServiceTest {
 		bookyUser.setLastname("burakan");
 		bookyUser.setPassword("serhad");
 		bookyUser.setLastPasswordResetDate(new Date());
-		bookOptional=Optional.of(bookyUser);
+		bookyUserOptional=Optional.of(bookyUser);
 	}
 
 	@Test
 	public void getByEmailSuccessful() {
-		when(bookyUserRepository.findOneByEmail(any())).thenReturn(bookOptional);
+		when(bookyUserRepository.findOneByEmail(any())).thenReturn(bookyUserOptional);
 		BookyUser bookyUser = userService.getByEmail("serhadburakan@hotmail.com");
 		assert (bookyUser.getFirstname().equals("serhad"));
 		assert (bookyUser.getLastname().equals("burakan"));
@@ -70,10 +71,18 @@ public class UserServiceTest {
 	@Test
 	public void createUserSuccessful() {
 		when(bookyUserRepository.save(bookyUser)).thenReturn(bookyUser);
+		when(bookyUserRepository.findOneByEmail(bookyUser.getEmail())).thenReturn(Optional.ofNullable(null));
 		BookyUser user = userService.createUser(new UserDTO(bookyUser));
 		String encodedPass=passwordEncoder.encode(bookyUser.getPassword());
 		assert (user.getPassword().substring(0, 5).equals(encodedPass.substring(0,5)));
 		assert (bookyUser.getLastname().equals("burakan"));
+	}
+	
+	@Test(expected=UserAlreadyExistsException.class)
+	public void createUserUserAlreadyExists() {
+		when(bookyUserRepository.save(bookyUser)).thenReturn(bookyUser);
+		when(bookyUserRepository.findOneByEmail(bookyUser.getEmail())).thenReturn(bookyUserOptional);
+		userService.createUser(new UserDTO(bookyUser));		
 	}
 	
 	@Test

@@ -75,10 +75,14 @@ public class Book implements Serializable {
 	public Book(BookDTO bookDTO) {
 		this.isbn = bookDTO.getIsbn();
 		this.name = bookDTO.getName();
+		this.price=bookDTO.getPrice();
 
 	}
 
 	public Double getPrice() {
+		if(price==null){
+			price=0d;
+		}
 		return price;
 	}
 

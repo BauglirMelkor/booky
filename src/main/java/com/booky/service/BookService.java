@@ -39,13 +39,14 @@ public class BookService {
 	private final BookRepository bookRepository;
 
 	private final CategoryService categoryService;
-	
+
 	private final StockRepository stockRepository;
 
-	public BookService(BookRepository bookRepository, CategoryService categoryService,StockRepository stockRepository) {
+	public BookService(BookRepository bookRepository, CategoryService categoryService,
+			StockRepository stockRepository) {
 		this.bookRepository = bookRepository;
 		this.categoryService = categoryService;
-		this.stockRepository=stockRepository;
+		this.stockRepository = stockRepository;
 	}
 
 	public Book getBookByIsbn(Long isbn) throws BookNotFoundException {
@@ -108,10 +109,10 @@ public class BookService {
 			Category category = categoryService.getCategoryById(bookDTO.getCategory().getId());
 			book.setCategory(category);
 		}
-		
-		try{
+
+		try {
 			bookRepository.save(book);
-		}catch(Exception e){
+		} catch (Exception e) {
 			log.error(e.getMessage());
 		}
 
@@ -130,6 +131,7 @@ public class BookService {
 			}
 			book.setIsbn(bookDTO.getIsbn());
 			book.setName(bookDTO.getName());
+			book.setPrice(bookDTO.getPrice());
 
 			return new AsyncResult<Book>(bookRepository.save(book));
 
@@ -147,38 +149,34 @@ public class BookService {
 
 		}
 	}
-	
+
 	@Async
 	public Future<List<StockDTO>> orderBook(List<BasketDTO> basketDTOList) {
-		
-		if(PaymentService.paymentProcess()==false){
+
+		if (PaymentService.paymentProcess() == false) {
 			return null;
 		}
-		
-		Map<BasketDTO, Integer> result =
-				basketDTOList.stream().collect(
-                Collectors.groupingBy(
-                        Function.identity(), Collectors.summingInt(p->p.getQuantity())
-                )
-        );
-		List<StockDTO> stockDTOList=new ArrayList<StockDTO>();
-		for(BasketDTO basketDTO:basketDTOList){
-			if(basketDTO.getBook()==null&&bookRepository.findOne(basketDTO.getBook().getId())==null){
+
+		Map<BasketDTO, Integer> result = basketDTOList.stream()
+				.collect(Collectors.groupingBy(Function.identity(), Collectors.summingInt(p -> p.getQuantity())));
+		List<StockDTO> stockDTOList = new ArrayList<StockDTO>();
+		for (BasketDTO basketDTO : basketDTOList) {
+			if (basketDTO.getBook() == null || bookRepository.findOne(basketDTO.getBook().getId()) == null) {
 				throw new BookNotFoundException("Book not Found");
 			}
-			Integer amount=result.get(basketDTO);
-			if(amount!=null){
-			Stock stock=new Stock();
-			Book book=bookRepository.findOne(basketDTO.getBook().getId());
-			stock.setBook(book);
-			stock.setSold(Integer.parseInt(amount.toString()));
-			stock.setDate(new Date());
-			stockRepository.save(stock);
-			stockDTOList.add(new StockDTO(stock));
-			result.remove(basketDTO);
+			Integer amount = result.get(basketDTO);
+			if (amount != null) {
+				Stock stock = new Stock();
+				Book book = bookRepository.findOne(basketDTO.getBook().getId());
+				stock.setBook(book);
+				stock.setSold(Integer.parseInt(amount.toString()));
+				stock.setDate(new Date());
+				stockRepository.save(stock);
+				stockDTOList.add(new StockDTO(stock));
+				result.remove(basketDTO);
 			}
 		}
-		
+
 		return new AsyncResult<>(stockDTOList);
 	}
 
