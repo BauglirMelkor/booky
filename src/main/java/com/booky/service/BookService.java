@@ -26,6 +26,7 @@ import com.booky.entity.Category;
 import com.booky.entity.Stock;
 import com.booky.exception.BookAlreadyExistsException;
 import com.booky.exception.BookNotFoundException;
+import com.booky.payment.PaymentService;
 import com.booky.repository.BookRepository;
 import com.booky.repository.StockRepository;
 
@@ -150,6 +151,10 @@ public class BookService {
 	@Async
 	public Future<List<StockDTO>> orderBook(List<BasketDTO> basketDTOList) {
 		
+		if(PaymentService.paymentProcess()==false){
+			return null;
+		}
+		
 		Map<BasketDTO, Integer> result =
 				basketDTOList.stream().collect(
                 Collectors.groupingBy(
@@ -158,6 +163,9 @@ public class BookService {
         );
 		List<StockDTO> stockDTOList=new ArrayList<StockDTO>();
 		for(BasketDTO basketDTO:basketDTOList){
+			if(basketDTO.getBook()==null&&bookRepository.findOne(basketDTO.getBook().getId())==null){
+				throw new BookNotFoundException("Book not Found");
+			}
 			Integer amount=result.get(basketDTO);
 			if(amount!=null){
 			Stock stock=new Stock();

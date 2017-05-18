@@ -45,22 +45,15 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
 	@Override
 	protected void configure(HttpSecurity httpSecurity) throws Exception {
-		httpSecurity
-				// we don't need CSRF because our token is invulnerable
+		httpSecurity				
 				.csrf().disable()
-
-				.exceptionHandling().authenticationEntryPoint(unauthorizedHandler).and()
-
-				// don't create session
+				.exceptionHandling().authenticationEntryPoint(unauthorizedHandler).and()				
 				.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
-
-				.authorizeRequests().antMatchers("/auth/**").permitAll().antMatchers("/user/**").permitAll()
+				.authorizeRequests().antMatchers("/auth/**").permitAll()
 				.antMatchers("/book/public/**").permitAll().anyRequest().authenticated();
-
-		// Custom JWT based security filter
+		
 		httpSecurity.addFilterBefore(authenticationTokenFilterBean(), UsernamePasswordAuthenticationFilter.class);
 
-		// disable page caching
 		httpSecurity.headers().cacheControl();
 	}
 }
