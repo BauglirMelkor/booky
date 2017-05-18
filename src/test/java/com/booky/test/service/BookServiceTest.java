@@ -64,16 +64,16 @@ public class BookServiceTest {
 	public void orderBookSuccessful() throws InterruptedException, ExecutionException {
 		List<BasketDTO> basketDTOList = new ArrayList<BasketDTO>();
 		BasketDTO basketDTO = new BasketDTO();
-		BookDTO book = new BookDTO();
-		book.setId(1L);
-		book.setIsbn(1111111111L);
-		book.setName("Vampire Of the Mists");
-		basketDTO.setBook(book);
+		BookDTO bookDTO = new BookDTO();
+		bookDTO.setId(1L);
+		bookDTO.setIsbn(1111111111L);
+		bookDTO.setName("Vampire Of the Mists");
+		basketDTO.setBook(bookDTO);
 		basketDTO.setQuantity(3);
 		basketDTOList.add(basketDTO);
 		basketDTOList.add(basketDTO);
 		when(stockRepository.save(any(Stock.class))).thenReturn(new Stock());
-
+		when(bookRepository.findOne(bookDTO.getId())).thenReturn(book);
 		Future<List<StockDTO>> stockFuture = bookService.orderBook(basketDTOList);
 		assert (stockFuture.get().get(0).getSold() == 6);
 	}
